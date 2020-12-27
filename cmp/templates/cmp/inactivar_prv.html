@@ -1,0 +1,68 @@
+ <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+  <!-- Pending Requests Card Example -->
+     <form method="POST" class="form_inline">
+            {% csrf_token %}
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-warning text-uppercase">
+                         <div class="alert">¿ Inactivar {{ obj.descripcion }} ?
+                         </div>
+                      </div>
+                     <div class="row">
+                       <button type="button" class="btn btn-danger" id="btninactivar"> <i class="far fa-question-circle"></i>Si, Eliminar</button>
+                       <button type="button" class="btn btn-success" onclick="return cerrar_modal()"> No,Cancelar</Button>                    
+                     </div>                    
+                  </div>
+                </div>
+              </div>
+            </div>
+    </form>
+</div>
+</div> 
+<script>
+ $(document).ready(function(){
+    var token = $('input[name=csrfmiddlewaretoken]').val();
+    $.ajaxSetup({
+     beforeSend: function(xhr, settings){
+       if(!(/^http:.*/.test(settings.url) || /^http:.*/.test(settings.url))){
+         xhr.setRequestHeader("X-CSRFToken",token);
+       }
+     }
+
+    });
+    $("#btninactivar").click(function(e){
+      // e.preventDefault();
+      // alert("Prueba de inav");
+      var id = {{ obj.id }};
+      var template = "{% url 'cmp:proveedor_inactivar' obj.id  %}";
+      var data = {"id":id};
+      data =  JSON.stringify(data);
+      
+      $.ajax({
+        type:"POST",
+        url: template,
+        data : data,
+        beforeSend: function(xhr, settings){ 
+          $.ajaxSettings.beforeSend(xhr,settings);
+        },
+        success: function(response){
+         console.log(response);
+         cerrar_modal();
+         alert(response);
+        },
+       
+        error: function(jqXHR,textStatus,errorThrow){
+          console.log(textStatus,errorThrow);
+          cerrar_modal();
+        }
+      });     
+
+    });
+
+  });
+
+</script>
